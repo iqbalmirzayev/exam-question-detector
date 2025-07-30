@@ -12,7 +12,7 @@ LABEL_MAP = {
     "questions_o": {"name": "açıq sual", "color": (0, 165, 255)},
 }
 DEFAULT_STYLE = {"name": "digər", "color": (255, 0, 0)}
-BACKEND_API_URL = "https://1a2b-3c4d-5e6f.ngrok-free.app/detect"
+BACKEND_API_URL = "https://b350b8a2287d.ngrok-free.app/detect"
 
 @st.cache_resource
 def load_roboflow_model():
