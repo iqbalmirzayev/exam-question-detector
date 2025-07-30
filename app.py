@@ -1,4 +1,3 @@
-# app_combined.py (Bütün səhvləri düzəldilmiş son versiya)
 
 import streamlit as st
 import cv2
@@ -8,15 +7,13 @@ from collections import Counter
 import requests
 import io
 
-# --- QLOBAL TƏNZİMLƏMƏLƏR ---
 LABEL_MAP = {
     "questions": {"name": "qapalı sual", "color": (0, 255, 0)},
     "questions_o": {"name": "açıq sual", "color": (0, 165, 255)},
 }
 DEFAULT_STYLE = {"name": "digər", "color": (255, 0, 0)}
-BACKEND_API_URL = "http://127.0.0.1:8000/detect"
+BACKEND_API_URL = "https://1a2b-3c4d-5e6f.ngrok-free.app/detect"
 
-# --- MODEL YÜKLƏMƏ FUNKSİYASI (YALNIZ ROBOFLOW ÜÇÜN) ---
 @st.cache_resource
 def load_roboflow_model():
     st.write("Roboflow modeli yüklənir...")
@@ -41,7 +38,6 @@ def load_roboflow_model():
         st.error(f"Roboflow modeli yüklənərkən xəta baş verdi: {e}")
         return None
 
-# --- NƏTİCƏLƏRİ ÇƏKMƏK ÜÇÜN FUNKSİYALAR ---
 def draw_roboflow_predictions(original_image, predictions):
     output_image_rgb = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
     pil_image = Image.fromarray(output_image_rgb)
@@ -92,7 +88,6 @@ def draw_backend_predictions(original_image, detections):
         draw.text((x1 + 5, text_bg_y1 + 5), text, font=font, fill=(0, 0, 0))
     return cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
 
-# --- STREAMLIT TƏTBİQİNİN ƏSAS HİSSƏSİ ---
 st.set_page_config(page_title="Model Test Platforması", page_icon="🤖", layout="wide")
 st.title("📄 Exam Question Detector")
 st.markdown("""
@@ -113,7 +108,6 @@ Yüklədiyiniz şəklin keyfiyyəti, modelin nə qədər dəqiq işləməsinə b
 """)
 st.divider()
 
-# --- YAN PANEL (SIDEBAR) ---
 with st.sidebar:
     st.header("Tənzimləmələr")
     model_choice = st.radio(
@@ -123,13 +117,11 @@ with st.sidebar:
     )
     st.divider()
     
-    # DÜZGÜN MƏNTİQ: Seçimə görə yalnız standart dəyəri təyin et.
     if model_choice == 'Roboflow (Server)':
         default_confidence = 0.50
-    else: # Lokal (API-Backend) seçildikdə
+    else:
         default_confidence = 0.65
 
-    # Slayder YALNIZ BİR DƏFƏ yaradılır.
     confidence_threshold = st.slider(
         "Confidence Level", 0.0, 1.0, default_confidence, 0.05
     )
@@ -137,7 +129,7 @@ with st.sidebar:
     uploaded_file = st.file_uploader("Bir şəkil seçin...", type=["jpg", "jpeg", "png"])
     submit_button = st.button("Obyektləri Təsbit Et")
 
-# --- ƏSAS MƏNTİQ ---
+#
 if uploaded_file is not None and submit_button:
     original_image = cv2.imdecode(np.frombuffer(uploaded_file.getvalue(), np.uint8), 1)
     
@@ -158,10 +150,10 @@ if uploaded_file is not None and submit_button:
                 all_predictions = predictions_json.get('predictions', [])
                 output_image = draw_roboflow_predictions(original_image, predictions_json)
         
-        else: # 'Lokal (API-Backend)' seçimi
+        else: 
             try:
                 files = {'file': (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
-                # DÜZƏLİŞ: Slayderin dəyərini backend-ə göndərmək üçün payload əlavə et.
+                
                 payload = {'confidence': confidence_threshold}
                 response = requests.post(BACKEND_API_URL, files=files, data=payload, timeout=60)
                 
